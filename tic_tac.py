@@ -69,6 +69,15 @@ class tic_tac_game:
     def toggle_player(self):
         self.current_player = next(self.players)
         
+    
+    def reset_game(self):
+        for row, row_content in enumerate(self.current_moves):
+            for col in enumerate(row_content):
+                row_content[col] = Move(row, col)
+        
+        self.has_winner = False
+        self.winner_combo = []
+        
         
     # def disapear_last_move(self):
     #     if Player.moves == 3:
@@ -81,6 +90,7 @@ class tic_tac_board(tk.Tk):
         self.title("Tic Tac Toe 2")
         self.cells = {}
         self.game = game
+        self._create_menu()
         self.create_board_display()
         self.create_board_grid()
     
@@ -90,7 +100,9 @@ class tic_tac_board(tk.Tk):
         self.display = tk.Label(
             master = display_frame,
             text = "Ready?",
-            font= font.Font(size = 28, weight = "bold"))
+            fg = "dark magenta",
+            font = ("Helvetica", 28)
+            )
         self.display.pack()
     
     def create_board_grid(self):
@@ -120,7 +132,28 @@ class tic_tac_board(tk.Tk):
                     pady = 5,
                     sticky = "nsew"
                     
-                )   
+                )  
+    def reset_board(self):
+        self.game.reset_game()
+        self.update_display(msg= "Ready?")
+        for button in self.cells.keys():
+            button.config(highlightbackground = "pink")
+            button.config(text ="")
+            button.config(fg = "dark magenta")
+            
+    
+    def _create_menu(self):
+        menu_bar = tk.Menu(master = self)
+        self.config(menu = menu_bar)
+        file_menu = tk.Menu(master = menu_bar)
+        file_menu.add_command(
+            label = "Play Again",
+            command = self.reset_board
+        )
+        file_menu.add_separator()
+        file_menu.add_command(label = "Exit", command = quit)
+        menu_bar.add_cascade(label= "Options", menu= file_menu)
+        
     def update_button(self, clicked_btn):
         clicked_btn.config(text = self.game.current_player.label)
         clicked_btn.config(fg = self.game.current_player.color)
@@ -157,4 +190,4 @@ class tic_tac_board(tk.Tk):
                 self.update_display(msg= msg)
                 
                 
-                
+
